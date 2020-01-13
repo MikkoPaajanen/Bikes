@@ -1,5 +1,22 @@
-// const config = require('./utils/config')
-// const express = require('express')
-// const bodyParser = require('body-parser')
-// const app = express()
-// const cors = require('cors')
+const config = require('./utils/config')
+const express = require('express')
+const bodyParser = require('body-parser')
+const app = express()
+const cors = require('cors')
+const bikesRouter = require('./controllers/bikes')
+const middleware = require('./utils/middleware')
+const mongoose = require('mongoose')
+const morgan = require('morgan')
+
+
+mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+morgan.token('content', function (req) { return JSON.stringify(req.body)})
+
+
+app.use(cors())
+app.use(bodyParser.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
+app.use('/api/bikes', bikesRouter)
+app.use(middleware.unknownEndpoint)
+
+module.exports = app
