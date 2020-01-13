@@ -10,6 +10,12 @@ const morgan = require('morgan')
 
 
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+  .then(() => {
+    console.log('connected to mongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to mongoDB:', error.message)
+  })
 morgan.token('content', function (req) { return JSON.stringify(req.body)})
 
 
@@ -18,5 +24,6 @@ app.use(bodyParser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 app.use('/api/bikes', bikesRouter)
 app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app

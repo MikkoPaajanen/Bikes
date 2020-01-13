@@ -1,46 +1,56 @@
 const bikesRouter = require('express').Router()
 const Bike = require('../models/bike')
 
-bikesRouter.get('/', (req, res) => {
-  Bike.find({}).then(bikes => {
-    res.json(bikes.map(bike => bike.toJSON()))
-  })
+bikesRouter.get('/', async (req, res) => {
+  const bikes = await Bike.find({})
+  res.json(bikes.map(bike => bike.toJSON()))
 })
 
-bikesRouter.get('/:id', (req, res, next) => {
-  Bike.findById(req.params.id)
-    .then(bike => {
-      if (bike) {
-        res.json(bike.toJSON())
-      } else {
-        res.status(404).end()
-      }
-    })
-    .catch(error => next(error))
+bikesRouter.get('/:id', async (req, res, next) => {
+  try {
+    const bikeToGet = await Bike.findById(req.params.id)
+    if (bikeToGet) {
+      res.json(bikeToGet.toJSON())
+    } else {
+      res.status(404).end()
+    }
+  }
+  catch (exception) {
+    next(exception)
+  }
 })
 
-bikesRouter.delete('/:id', (req, res, next) => {
-  Bike.findByIdAndRemove(req.params.id)
-    .then(() => {
+bikesRouter.delete('/:id', async (req, res, next) => {
+  try {
+    const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
+    if (bikeToDelete) {
+      console.log(bikeToDelete)
+      res.status(204).json(bikeToDelete.toJSON())
+    } else {
       res.status(204).end()
-    })
-    .catch(error => next(error))
+    }
+  }
+  catch(exception) {
+    next(exception)
+  }
 })
 
-bikesRouter.post('/', (req, res, next) => {
+bikesRouter.post('/', async (req, res, next) => {
   const body = req.body
 
-  const bike = new Bike({
-    brand: body.brand,
-    model: body.model,
-    year: body.year
-  })
-
-  bike.save()
-    .then(savedBike => {
-      res.json(savedBike.toJSON())
+  try {
+    const bike = new Bike({
+      brand: body.brand,
+      model: body.model,
+      year: body.year
     })
-    .catch(error => next(error))
+  
+    const savedBike = await bike.save()
+    res.status(201).json(savedBike.toJSON())
+  } catch (exception) {
+    next(exception)
+  }
+  
 })
 
 
