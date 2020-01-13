@@ -23,12 +23,8 @@ bikesRouter.get('/:id', async (req, res, next) => {
 bikesRouter.delete('/:id', async (req, res, next) => {
   try {
     const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
-    if (bikeToDelete) {
-      console.log(bikeToDelete)
-      res.status(204).json(bikeToDelete.toJSON())
-    } else {
-      res.status(204).end()
-    }
+    console.log(bikeToDelete)
+    res.status(204).end()
   }
   catch(exception) {
     next(exception)
@@ -42,7 +38,8 @@ bikesRouter.post('/', async (req, res, next) => {
     const bike = new Bike({
       brand: body.brand,
       model: body.model,
-      year: body.year
+      year: body.year,
+      price: body.price
     })
   
     const savedBike = await bike.save()

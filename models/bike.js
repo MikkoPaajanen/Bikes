@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const bikeSchema = new mongoose.Schema({
   brand: { type: String, required: true },
   model: { type: String, required: true },
-  year: Number
+  year: Number,
+  price: { type: Number, required: true }
 })
 
 bikeSchema.set('toJSON', {
