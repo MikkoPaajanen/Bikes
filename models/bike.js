@@ -4,7 +4,11 @@ const bikeSchema = new mongoose.Schema({
   brand: { type: String, required: true },
   model: { type: String, required: true },
   year: Number,
-  price: { type: Number, required: true }
+  price: { type: Number, required: true },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 bikeSchema.set('toJSON', {
