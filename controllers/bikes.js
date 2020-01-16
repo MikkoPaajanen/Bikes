@@ -31,10 +31,22 @@ const getTokenFrom = request => {
 }
 
 bikesRouter.delete('/:id', async (req, res, next) => {
+  const token = getTokenFrom(req)
   try {
-    const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
-    console.log(bikeToDelete)
-    res.status(204).end()
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+    const bike = await Bike.findById(req.params.id)
+    if ( bike.user.toString() === user._id.toString() ) {
+      const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
+      console.log(bikeToDelete)
+      res.status(204).end()
+    } else {
+      res.status(403).json({ error: 'You dont have right to remove this item' })
+    }
+    
   }
   catch(exception) {
     next(exception)
