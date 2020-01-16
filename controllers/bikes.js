@@ -1,6 +1,7 @@
 const bikesRouter = require('express').Router()
 const Bike = require('../models/bike')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 bikesRouter.get('/', async (req, res) => {
   const bikes = await Bike.find({}).populate('user', { username: 1, firstname: 1, lastname: 1 })
@@ -21,6 +22,14 @@ bikesRouter.get('/:id', async (req, res, next) => {
   }
 })
 
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7)
+  }
+  return null
+}
+
 bikesRouter.delete('/:id', async (req, res, next) => {
   try {
     const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
@@ -35,10 +44,17 @@ bikesRouter.delete('/:id', async (req, res, next) => {
 bikesRouter.post('/', async (req, res, next) => {
   const body = req.body
 
-  const user = await User.findById(body.userId)
-  console.log('user', user)
-
+  const token = getTokenFrom(req)
+  
   try {
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    const user = await User.findById(decodedToken.id)
+    console.log('user', user)
+
     const bike = new Bike({
       brand: body.brand,
       model: body.model,
