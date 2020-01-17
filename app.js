@@ -1,13 +1,4 @@
 const config = require('./utils/config')
-// const cloudinary = require('cloudinary').v2
-
-// if (typeof (config.CLOUDINARY_URL) === 'undefined') {
-//   console.log('cloudinary config is undefined')
-// } else {
-//   console.log('cloudinary config')
-//   console.log(cloudinary.config())
-// }
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()

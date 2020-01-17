@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage})
 
 
-imagesRouter.post('/', upload.single('image'), async (req, res, next) => {
+imagesRouter.post('/', upload.single('File'), async (req, res, next) => {
   try {
     console.log('request', req.file)
     console.log('you successfully send a photo')
