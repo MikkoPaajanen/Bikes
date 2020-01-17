@@ -39,6 +39,8 @@ bikesRouter.delete('/:id', async (req, res, next) => {
     }
     const user = await User.findById(decodedToken.id)
     const bike = await Bike.findById(req.params.id)
+    console.log('user', user)
+    console.log('bike', bike)
     if ( bike.user.toString() === user._id.toString() ) {
       const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
       console.log(bikeToDelete)
