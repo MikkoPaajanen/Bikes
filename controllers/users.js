@@ -28,7 +28,7 @@ usersRouter.post('/', async (req, res, next) => {
 usersRouter.get('/', async (req, res, next) => {
   try {
     const users = await User
-      .find({}).populate('bikes', { id: 1, brand: 1, model: 1, year: 1, price: 1 })
+      .find({}).populate('bikes', { id: 1, brand: 1, model: 1, year: 1, price: 1, imgUrl: 1 })
     res.json(users.map(u => u.toJSON()))
   } catch (exception) {
     next(exception)

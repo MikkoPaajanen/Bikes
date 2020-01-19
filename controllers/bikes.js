@@ -43,8 +43,8 @@ bikesRouter.delete('/:id', async (req, res, next) => {
     console.log('bike', bike)
     if ( bike.user.toString() === user._id.toString() ) {
       const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
-      console.log(bikeToDelete)
-      res.status(204).end()
+      console.log('bikeToDelete', bikeToDelete)
+      res.status(204).json(bikeToDelete.toJSON())
     } else {
       res.status(403).json({ error: 'You dont have right to remove this item' })
     }
@@ -70,10 +70,14 @@ bikesRouter.post('/', async (req, res, next) => {
     console.log('user', user)
 
     const bike = new Bike({
+      type: body.type,
       brand: body.brand,
       model: body.model,
       year: body.year,
       price: body.price,
+      location: body.location,
+      description: body.description,
+      imgUrl: body.imgUrl,
       user: user._id
     })
   
