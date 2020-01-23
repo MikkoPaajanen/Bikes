@@ -63,6 +63,7 @@ bikesRouter.delete('/:id', async (req, res, next) => {
     console.log('bike', bike)
     if ( bike.user.toString() === user._id.toString() ) {
       const bikeToDelete = await Bike.findByIdAndRemove(req.params.id)
+      await cloudinary.uploader.destroy(bikeToDelete.imgPublic_id)
       console.log('bikeToDelete', bikeToDelete)
       res.status(204).json(bikeToDelete.toJSON())
     } else {
@@ -104,6 +105,7 @@ bikesRouter.post('/', upload.single('File'), async (req, res, next) => {
       contact: body.contact,
       description: body.description,
       imgUrl: uploadedImage.secure_url,
+      imgPublic_id: uploadedImage.public_id,
       user: user._id
     })
   
