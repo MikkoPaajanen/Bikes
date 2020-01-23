@@ -7,6 +7,7 @@ const bikeSchema = new mongoose.Schema({
   year: Number,
   price: { type: Number, required: true },
   location: { type: String, required: true },
+  contact: { type: String, required: true },
   description: String,
   imgUrl: { type: String, required: true },
   user: {
