@@ -1,5 +1,5 @@
 const config = require('../utils/config')
-const cloudinary = require('cloudinary').v2
+const cloudinary = require('cloudinary')
 
 if (typeof (config.CLOUDINARY_URL) === 'undefined') {
   console.log('cloudinary config is undefined')
@@ -11,17 +11,19 @@ const bikesRouter = require('express').Router()
 const Bike = require('../models/bike')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const fs = require('fs')
+const cloudinaryStorage = require('multer-storage-cloudinary')
 const multer = require('multer')
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, './uploads')
-  },
-  filename: function(req, file, cb) {
-    cb(null, new Date().toISOString() + file.originalname)
+
+
+const storage = cloudinaryStorage({
+  cloudinary,
+  folder: 'uploads',
+  allowedFormats: [ 'jpg', 'png' ],
+  filename: function (req, file, cb) {
+    cb(undefined, new Date().toISOString() + file.originalname)
   }
 })
-const upload = multer({storage: storage})
+const parser = multer({storage: storage})
 
 bikesRouter.get('/', async (req, res) => {
   const bikes = await Bike.find({}).populate('user', { username: 1, firstname: 1, lastname: 1 })
@@ -76,9 +78,9 @@ bikesRouter.delete('/:id', async (req, res, next) => {
   }
 })
 
-bikesRouter.post('/', upload.single('File'), async (req, res, next) => {
+bikesRouter.post('/', parser.single('File'), async (req, res, next) => {
   const body = req.body
-
+  console.log('req file', req.file)
   const token = getTokenFrom(req)
   
   try {
@@ -86,11 +88,6 @@ bikesRouter.post('/', upload.single('File'), async (req, res, next) => {
     if (!token || !decodedToken.id) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-
-    const uploadedImage = await cloudinary.uploader.upload(`${req.file.path}`, { tags: 'bike'},
-      function(error, result) {console.log(result, error)})
-    
-    fs.unlinkSync(req.file.path)
 
     const user = await User.findById(decodedToken.id)
     console.log('user', user)
@@ -104,8 +101,8 @@ bikesRouter.post('/', upload.single('File'), async (req, res, next) => {
       location: body.location,
       contact: body.contact,
       description: body.description,
-      imgUrl: uploadedImage.secure_url,
-      imgPublic_id: uploadedImage.public_id,
+      imgUrl: req.file.secure_url,
+      imgPublic_id: req.file.public_id,
       user: user._id
     })
   
