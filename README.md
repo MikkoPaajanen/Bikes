@@ -6,3 +6,4 @@ This is Full Stack Application which has frontend done with React.js backend wit
 
 It is an web application for selling and buying secondhand bicycles and related accessories.
 
+This repository has backend code and production build of frontend. Frontend code can be found from another repository called BikesFrontend.
